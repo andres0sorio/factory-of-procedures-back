@@ -15,6 +15,7 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,6 +23,8 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -30,6 +33,9 @@ import edu.uniandes.ecos.codeaholics.config.Constants;
 import edu.uniandes.ecos.codeaholics.config.Routes;
 import edu.uniandes.ecos.codeaholics.exceptions.AuthenticationException.WrongUserOrPasswordException;
 import edu.uniandes.ecos.codeaholics.main.App;
+import edu.uniandes.ecos.codeaholics.persistence.Citizen;
+import edu.uniandes.ecos.codeaholics.persistence.Dependency;
+import edu.uniandes.ecos.codeaholics.persistence.Functionary;
 import spark.Spark;
 
 /**
@@ -125,6 +131,43 @@ public class AdminTest {
 			urlConnection.setRequestProperty("Content-type", "application/json");
 			urlConnection.setRequestMethod("POST");
 
+			
+			/*
+			 * {"citizen":
+			 * {"identification":1234567890,"name":"Andrés","lastName1":"Osorio","lastName2":"Vargas","email":"aosorio@uniandes.edu.co","fullName":"Andrés Osorio Vargas"},
+			 * "dependency":{"name":"Hacienda","functionaries":[{"email":"jvaldez@anapoima.gov.co"}]}}
+			 */
+			
+			 Gson gsonBuilder = new GsonBuilder()
+				       .enableComplexMapKeySerialization()
+				       .create();
+
+			Citizen citizenInfo = new Citizen();
+			citizenInfo.setIdentification(1234567890);
+			citizenInfo.setName(USER_TO_UPDATE_NAME);
+			citizenInfo.setLastName1(USER_TO_UPDATE_LASTNAME);
+			citizenInfo.setLastName2(USER_TO_UPDATE_LASTNAME2);
+			citizenInfo.setEmail(USER_TO_UPDATE_EMAIL);
+			
+			Dependency dependencyInfo = new Dependency();
+			dependencyInfo.setName(USER_TO_UPDATE_DEPENDENCY);
+			ArrayList<Functionary> functionaries = new ArrayList<Functionary>();
+			Functionary functionary = new Functionary();
+			functionary.setEmail("jvaldez@anapoima.gov.co");
+			functionaries.add(functionary);
+					
+			Gson gson = new Gson();
+			String citizenString = gson.toJson(citizenInfo);
+			String dependencyString = gson.toJson(dependencyInfo);
+					
+			//String loginData = info.toString();		
+			logger.info(citizenString);
+			logger.info(dependencyString);
+			
+			//String loginData = "{email : \"" + USER_TO_UPDATE_EMAIL + "\"}";
+			//loginData += "{ dependency : \"" + USER_TO_UPDATE_DEPENDENCY + "\" }";
+
+			
 			String loginData = "{email : \"" + USER_TO_UPDATE_EMAIL + "\"}";
 			loginData += "{ dependency : \"" + USER_TO_UPDATE_DEPENDENCY + "\" }";
 
